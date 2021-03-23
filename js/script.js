@@ -1,15 +1,18 @@
 /******************************************
-Treehouse FSJS Techdegree:
-project 1 - A Random Quote Generator
+RANDOM QUOTE GENERATOR
+
+The following script contains source code for a website that
+displays random quotes to a user. Every ten seconds the
+website automatically updates the quote, but the user
+can also change the displayed quote by clicking a button.
 ******************************************/
 
-// For assistance: 
-  // Check the "Project Resources" section of the project instructions
-  // Reach out in your Slack community - https://treehouse-fsjs-102.slack.com/app_redirect?channel=chit-chat
-
-/*** 
- * `quotes` array 
-***/
+/**
+ * Array that holds each quote object.
+ * Every quote is expected to have a quote, source
+ * and image property, but can also contain a
+ * citation and a year.
+*/
 const quotes = [
   {
     quote: "“Be yourself; everyone else is already taken.",
@@ -51,67 +54,94 @@ const quotes = [
   }
 ]
 
-/***
- * `getRandomQuote` function
-***/
+/**
+ * Function that returns a number from
+ * 0 to the number provided, exclusive.
+ * @param {Number}  upperBound The upper bound for the potential random number
+ * @return {Number}            The generated random number
+ */
+function getRandomNumber(upperBound)
+{
+  return Math.floor(Math.random() * Math.floor(upperBound));
+}
+
+/**
+ * Function that selects and returns a random quote 
+ * from the 'quotes' array
+*/
 let prevNum = 0;
 function getRandomQuote() {
-  let randomNum = Math.floor(Math.random() * Math.floor(quotes.length));
+  // Set initial value of random index
+  let randomNum = getRandomNumber(quotes.length);
+  // To prevent same quote generating twice in a row,
+  // loop until randomNum is different from previous number
   while (randomNum == prevNum) {
-    randomNum = Math.floor(Math.random() * Math.floor(quotes.length));
+    randomNum = getRandomNumber(quotes.length);
   }
+  // Set the prevNum value to equal our current value.
   prevNum = randomNum;
   return quotes[randomNum];
 }
 
-/***
- * `printQuote` function
-***/
+/**
+ * Function to retrieve a random quote and to place it on the screen.
+*/
 
 function printQuote() {
+  // Retrieve the quote
   let quote = getRandomQuote();
+  // Create the initial string
   let html = `<img class="icon" src=${quote.image}>
               <p class="quote">${quote.quote}</p>
               <p class="source">${quote.source}`;
+  // If there is a citation, add the citation
   if (typeof(quote.citation) !== "undefined") {
     html += `<span class="citation">${quote.citation}</span>`;
   }
+  // If there is a year, add the year
   if (typeof(quote.year) !== "undefined") {
     html += `<span class="year">${quote.year}</span>`;
   }              
   html += `</p>`;
 
+  // Add the quote to the screen in the quote-box element
   document.getElementById('quote-box').innerHTML = html;
-  randomColor();
-  
+  // Change the background color
+  changeBackgroundColor();
 }
 
 
-/***
- * `randomColor` function
+/**
+ * Function to change the website's background color
  */
 let prevColorNum = 0;
 const colors = ["rgb(212, 151, 123)", "rgb(179, 123, 212)", "rgb(145, 212, 123)", "rgb(212, 123, 123)", "rgb(123, 123, 212)"];
 
-function randomColor() {
-  let randIdx = Math.floor(Math.random() * Math.floor(colors.length));
+function changeBackgroundColor() {
+  // Set inital value of random index 
+  let randIdx = getRandomNumber(colors.length);
+  // Loop until the index isn't equal to the previous index value
   while (randIdx == prevColorNum) {
-    randIdx = Math.floor(Math.random() * Math.floor(colors.length));
+    randIdx = getRandomNumber(colors.length);
   }
+  // Update the previous index value to the current index value
   prevColorNum = randIdx;
+  // Reset the interval timer
+  resetQuoteTimer();
+  // Set the background to the random color in the 'colors' array
   document.body.style.background = colors[randIdx];
 }
 
 /***
- * `setInterval` function
+ * Function that resets the interval timer. To be used
+ * when user clicks 'Show another quote' button so each
+ * quote gets displayed for at least 10 seconds
  */
- setInterval(printQuote, 10000);
+var intervalTimer = setInterval(printQuote, 10000);
+function resetQuoteTimer() {
+  clearInterval(intervalTimer);
+  intervalTimer = setInterval(printQuote, 10000);
+}
 
-
-
-/***
- * click event listener for the print quote button
- * DO NOT CHANGE THE CODE BELOW!!
-***/
-
+// click event listener for the print quote button
 document.getElementById('load-quote').addEventListener("click", printQuote, false);
